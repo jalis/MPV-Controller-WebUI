@@ -1,0 +1,20 @@
+<div class="flex-container">
+    <div class="play-area">
+        <div id="file-browser" class="file-browser">
+            <%= erb :filelist %>
+        </div>
+
+        <div class="control-buttons" id="control-buttons">
+            <%= erb :control %>
+        </div>
+
+        <div data-update-key="<%= @playlist_update_key %>" id="playlist-container" class="playlist">
+            <%= erb :playlist %>
+        </div>
+    </div>
+
+    <div class="now-playing">
+        <p id="media-title"><%= @title%></p>
+        <%= erb :seekbar %>
+    </div>
+</div>

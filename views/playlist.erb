@@ -1,0 +1,7 @@
+<ul id="playlist-list">
+    <%@playlist.each_with_index do |item, i|%>
+            <li class="playlist-item <%= item['current'] ? "playlist-item-current" : "" %>" data-playlist-id="<%= i %>">
+                <%= item['title'] ? item['title'] : item['filename'] %>
+            </li>
+    <% end%>
+</ul>

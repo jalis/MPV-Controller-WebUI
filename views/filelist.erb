@@ -1,0 +1,27 @@
+<%
+def unpack_media(media)
+    return_string=""
+    media.each do |item|
+        if item[:type]==1
+            return_string << "<li class=\"filelist-item\">\n"
+
+            return_string << "<ul class=\"filelist-folder\" >\n"
+            return_string << "<input class=\"folder-selector\" type=\"checkbox\" id=\"%s\" >" % [item[:folder_path]]
+            return_string << "<label class=\"folder-selector-label\" for=\"%s\" > %s </label>" % [item[:folder_path], item[:folder_path]]
+
+            return_string << unpack_media(item[:data])
+            return_string << "</ul>"
+        else
+            return_string << "<li class=\"filelist-item-item\" data-file-path=\"%s\">\n" % [File.join(item[:folder_path], item[:data])]
+
+            return_string << item[:data]
+        end
+        return_string << "</li>\n"
+    end
+    return return_string;
+end
+%>
+
+<ul id="filelist-list">
+    <%= unpack_media(@media) %>
+</ul>

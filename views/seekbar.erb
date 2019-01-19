@@ -1,0 +1,13 @@
+<form id="seekbar-form">
+    <div class="seekbar-content">
+    <span class="seekbar-zero">0:00</span>
+    <input id="seekbar" data-start-paused="<%= @paused %>" type="range" name="seek" min="0" max="<%= @duration ? @duration : 1 %>" value="<%= @position %>" step="0.1">
+    <span id="seekbar-duration"><%= @duration ? ("%i:%02i" % [(@duration/60).floor, (@duration.remainder(60)).floor]) : "0:00" %></span>
+    </div>
+</form>
+
+<div id="seekbar-buttons" class="seekbar-buttons">
+    <button data-function="play-prev">⏮️</button>
+    <button data-function="pause">⏯️</button>
+    <button data-function="play-next">⏭️</button>
+</div>

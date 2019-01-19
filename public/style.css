@@ -1,0 +1,161 @@
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+.now-playing {
+    text-align:center;
+    margin-top: 10px;
+}
+.seekbar-content {
+    text-align:center;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: column;
+}
+.play-area {
+    position:relative;
+    display: flex;
+    justify-content: space-evenly;
+}
+.file-browser {
+    display:inline-block;
+    border: 2px solid black;
+    width: 45%;
+    overflow-y: scroll;
+    height: 80vh;
+}
+.control-buttons {
+    width: 5%;
+    height: 80vh;
+    text-align:center;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+.control-buttons > div > input, .control-buttons > div > button {
+    width: 100%;
+    height: 5%;
+    font-size: 25px;
+}
+
+.playlist {
+    display:inline-block;
+    position:relative;
+    border: 2px solid black;
+    width: 45%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 80vh;
+}
+#playlist-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.playlist-item {
+    user-select: none;
+    padding-top:10px;
+    padding-bottom:10px;
+    text-align: left;
+}
+.playlist-item-current {
+    background: rgba(127,127,127,0.5);
+}
+.playlist-item-selected {
+    background: rgba(50,50,200,0.5);
+}
+
+.divider {
+    flex-shrink:1;
+    height: 30px;
+}
+
+.file-browser {
+    display:inline-block;
+    position:relative;
+    border: 2px solid black;
+    width: 45%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 80vh;
+}
+#filelist-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    margin-left: -1em;
+}
+.filelist-item {
+    user-select: none;
+    text-align: left;
+    width: 100%;
+}
+.filelist-item-selected {
+    background: rgba(50,50,200,0.5);
+}
+
+.filelist-item-item {
+    padding-top:10px;
+    padding-bottom:10px;
+}
+.filelist-item-item:before {
+    content: "🎞️"
+}
+
+.filelist-folder {
+    list-style:none;
+    margin:0;
+    padding:0;
+    padding-top:10px;
+    padding-bottom:10px;
+}
+.filelist-folder:before {
+    content: "📁"
+}
+.folder-selector:not(:checked)~.filelist-item {
+    display: none;
+}
+.folder-selector:not(:checked)~.filelist-item-item {
+    display: none;
+}
+.filelist-item, .filelist-item-item {
+    padding-left: 1.5em;
+}
+.folder-selector {
+    display: none;
+}
+
+
+.divider {
+    flex-shrink:1;
+    height: 30px;
+}
+
+
+
+
+#seekbar {
+    width: 90%;
+    height: 20px;
+}
+.seekbar-zero, #seekbar-duration {
+    display: inline-block;
+    line-height: 30px;
+    font-size: 20px;
+    height: 30px;
+}
+
+.seekbar-buttons {
+    margin-top: 10px;
+    display:flex;
+    justify-content: center;
+}
+.seekbar-buttons > button {
+    display: block;
+    font-size: 30px;
+    border: none;
+    background: transparent;
+}
