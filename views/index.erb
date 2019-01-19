@@ -1,7 +1,26 @@
+<div id="error-area">
+</div>
+
 <div class="flex-container">
     <div class="play-area">
         <div id="file-browser" class="file-browser">
+            <input class="hidden-radio" id="files-radio" type="radio" name="tabs" value="0" checked >
+            <input class="hidden-radio" id="youtube-radio" type="radio" name="tabs" value="1">
+            <input class="hidden-radio" id="raw-radio" type="radio" name="tabs" value="2">
+
+            <div class="tab-flex">
+                <label class="tab-label files-label" for="files-radio">Files</label>
+                <label class="tab-label youtube-label" for="youtube-radio">YouTube</label>
+                <label class="tab-label raw-label" for="raw-radio">Raw</label>
+            </div>
             <%= erb :filelist %>
+            <%= erb :youtube %>
+            <div id="raw-add">
+                <form id="raw-form">
+                    <input type="text" name="filepath">
+                    <input type="submit" value="Add">
+                </form>
+            </div>
         </div>
 
         <div class="control-buttons" id="control-buttons">

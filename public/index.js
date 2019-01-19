@@ -25,6 +25,10 @@ var currentFilelistSelection=null;
 
 var fileBrowser=null;
 
+var errorArea=null;
+
+var youtubeSearchResults=null;
+
 document.addEventListener('DOMContentLoaded',function() {
     playlistList=document.getElementById("playlist-container");
     playlistList.addEventListener('click', playlistSelect);
@@ -38,6 +42,15 @@ document.addEventListener('DOMContentLoaded',function() {
 
     document.getElementById("seekbar-form").addEventListener('input', seekbarInput);
     document.getElementById("seekbar-buttons").addEventListener('click', controlsSubmit);
+
+    document.getElementById("files-radio").addEventListener('input', tabChanged);
+    document.getElementById("youtube-radio").addEventListener('input', tabChanged);
+    document.getElementById("raw-radio").addEventListener('input', tabChanged);
+
+    document.getElementById("raw-form").addEventListener('submit', rawSubmit);
+    document.getElementById("youtube-search-form").addEventListener('submit', youtubeSubmit);
+
+    youtubeSearchResults=document.getElementById("youtube-search-results");
 
     seekbarElement=document.getElementById('seekbar');
     seekbarDurationElement=document.getElementById('seekbar-duration');
@@ -58,6 +71,9 @@ document.addEventListener('DOMContentLoaded',function() {
 
     playlistForm=document.getElementById("playlist-form");
     mediaTitleElement=document.getElementById("media-title");
+
+    errorArea=document.getElementById("error-area");
+    errorArea.addEventListener('animationiteration', errorSlideEnd);
 },false);
 
 function sendCommand(cmd, arg, callback_func=function(){}) {
@@ -70,7 +86,7 @@ function sendCommand(cmd, arg, callback_func=function(){}) {
     fetch(target).then(
         function(response) {
             if(response.status !== 200) {
-                console.log('Error status: '+ response.status);
+                addErrorBox('Error status: '+ response.status);
                 callback_func(null, false);
                 return;
             }
@@ -80,7 +96,7 @@ function sendCommand(cmd, arg, callback_func=function(){}) {
             });
         }
     ).catch(function(err) {
-        console.log('Fetch error: ', err);
+        addErrorBox(`Fetch error: ${err}`);
     });
 }
 
@@ -90,7 +106,7 @@ function getUpdates() {
     fetch("./update").then(
         function(response) {
             if(response.status !== 200) {
-                console.log('Update error: ' + response.status);
+                addErrorBox('Update error: ' + response.status);
                 return;
             }
 
@@ -131,7 +147,7 @@ function getUpdates() {
             });
         }
     ).catch(function(err) {
-        console.log('Update fetch error: ', err);
+        addErrorBox(`Fetch error: ${err}`);
     });
 }
 
@@ -187,23 +203,33 @@ function pause() {
 }
 
 function filelistSelect(e) {
-    if(!e.target.dataset.filePath) {
-        return;
+    var target=e.target
+    if(!target.dataset.filePath) {
+        if(!target.parentElement.dataset.filePath) {
+            return;
+        } else {
+            target=target.parentElement;
+        }
     }
     if(currentFilelistSelection) {
         currentFilelistSelection.classList.remove("filelist-item-selected");
     }
-    currentFilelistSelection=e.target;
+    currentFilelistSelection=target;
     currentFilelistSelection.classList.add("filelist-item-selected");
 }
 function filelistAdd(e) {
-    if(!e.target.dataset.filePath) {
-        return;
+    var target=e.target
+    if(!target.dataset.filePath) {
+        if(!target.parentElement.dataset.filePath) {
+            return;
+        } else {
+            target=target.parentElement;
+        }
     }
     if(currentFilelistSelection) {
         currentFilelistSelection.classList.remove("filelist-item-selected");
     }
-    currentFilelistSelection=e.target;
+    currentFilelistSelection=target;
     currentFilelistSelection.classList.add("filelist-item-selected");
 
     sendCommand("play?file="+currentFilelistSelection.dataset.filePath, null, function(data, success) {
@@ -283,5 +309,97 @@ function controlsSubmit(e) {
         case "pause":
             pause();
             break;
+    }
+}
+function tabChanged(e) {
+    if(currentFilelistSelection) {
+        currentFilelistSelection.classList.remove("filelist-item-selected");
+        currentFilelistSelection=null;
+    }
+}
+
+function rawSubmit(e) {
+    e.preventDefault();
+
+    sendCommand("play?file="+e.target.elements['filepath'].value, null, function(data, success) {
+        if(success && data['error']==="success") {
+            updatePlaylist();
+        }
+    });
+    e.target.reset();
+}
+
+function youtubeSubmit(e) {
+    e.preventDefault();
+
+    fetch("https://www.googleapis.com/youtube/v3/search?key="+ youtubeApiKey +"&part=snippet&maxResults=25&type=video&q="+e.target.elements['query'].value).then(
+        function(response) {
+            if(response.status !== 200) {
+                addErrorBox('Error status: '+ response.status);
+                return;
+            }
+
+            response.json().then(function(data) {
+                createYoutubeList(data);
+            });
+        }
+    ).catch(function(err) {
+        addErrorBox(`Fetch error: ${err}`);
+    });
+    
+    e.target.reset();
+}
+function createYoutubeList(data) {
+    youtubeSearchResults.innerHTML="";
+
+    data['items'].forEach(function(e) {
+        var item=document.createElement("LI");
+        item.classList.add("yt-result");
+        item.dataset.filePath="https://youtu.be/"+e.id.videoId
+
+        var thumb=document.createElement("IMG");
+        thumb.src=e['snippet']['thumbnails']['default']['url'];
+        thumb.classList.add("yt-thumbnail");
+
+        var title=document.createElement("P");
+        title.innerText=e['snippet']['title'];
+        title.classList.add("yt-title");
+
+        var desc=document.createElement("P");
+        desc.innerText=e['snippet']['description'];
+        desc.classList.add("yt-description");
+
+        var uploader=document.createElement("P");
+        uploader.innerText=e['snippet']['channelTitle'];
+        uploader.classList.add("yt-uploader");
+
+        item.appendChild(thumb);
+        item.appendChild(title);
+        item.appendChild(desc);
+        item.appendChild(uploader);
+        youtubeSearchResults.appendChild(item);
+
+        if(title.offsetWidth > item.offsetWidth - 125) {
+            title.classList.add("marquee");
+
+/*            var duration=0;
+            duration=1-(100*(1/title.offsetWidth));
+            console.log(duration);
+            duration=8*duration;
+            title.style.animationDuration=duration+"s";*/
+        }
+    });
+}
+
+function addErrorBox(msg) {
+    err=document.createElement("P")
+    err.innerText=msg;
+    errorArea.appendChild(err);
+    errorArea.style.animationPlayState="running";
+}
+function errorSlideEnd(e) {
+    errorArea.removeChild(errorArea.children[0]);
+    if(errorArea.childElementCount===0) {
+        errorArea.style.animationPlayState="paused";
     }
 }
