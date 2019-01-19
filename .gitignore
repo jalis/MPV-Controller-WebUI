@@ -1,4 +1,5 @@
 apikeys.js
+
 android-chrome-192x192.png
 android-chrome-256x256.png
 apple-touch-icon.png
@@ -10,3 +11,5 @@ mstile-150x150.png
 safari-pinned-tab.svg
 site.webmanifest
 metadata.erb
+
+config.rb

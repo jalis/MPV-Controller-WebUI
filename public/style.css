@@ -235,7 +235,7 @@
 @keyframes error-slide {
     0% {top:0px;}
     75% {top:0px;}
-    100% {top: -50px;}
+    100% {top: -150px;}
 }
 
 #youtube-search-form {

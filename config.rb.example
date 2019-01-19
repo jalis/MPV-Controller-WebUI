@@ -1,0 +1,6 @@
+#Rename to config.rb to use these default values, you probably need to change them though.
+MEDIA_FOLDER = '%HOMEPATH%'
+MPV_PATH = 'C:/Program Files/MPV'
+PIPE_NAME = 'mpvsocket'
+ACCESS_KEY = 'changethis'
+NOAUTH_PAGES = ['/style.css', '/index.js', '/apikeys.js']

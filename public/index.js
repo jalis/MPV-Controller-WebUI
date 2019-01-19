@@ -29,6 +29,23 @@ var errorArea=null;
 
 var youtubeSearchResults=null;
 
+var accessKey=null;
+
+//Snippet from https://stackoverflow.com/questions/5448545/how-to-retrieve-get-parameters-from-javascript
+function findGetParameter(parameterName) {
+    var result = null,
+        tmp = [];
+    location.search
+        .substr(1)
+        .split("&")
+        .forEach(function (item) {
+          tmp = item.split("=");
+          if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+        });
+    return result;
+}
+//End snippet
+
 document.addEventListener('DOMContentLoaded',function() {
     playlistList=document.getElementById("playlist-container");
     playlistList.addEventListener('click', playlistSelect);
@@ -74,14 +91,23 @@ document.addEventListener('DOMContentLoaded',function() {
 
     errorArea=document.getElementById("error-area");
     errorArea.addEventListener('animationiteration', errorSlideEnd);
+
+    accessKey=findGetParameter("key");
 },false);
 
 function sendCommand(cmd, arg, callback_func=function(){}) {
     var target='./'+cmd;
 
     if(arg) {
-        target+='/' + arg
+        target+='/' + arg;
     }
+
+    if(target.indexOf('?') > -1) {
+        target+='&key=';
+    } else {
+        target+='?key=';
+    }
+    target+=accessKey;
 
     fetch(target).then(
         function(response) {
@@ -103,7 +129,7 @@ function sendCommand(cmd, arg, callback_func=function(){}) {
 function getUpdates() {
     updateRequestSent=true;
 
-    fetch("./update").then(
+    fetch("./update?key="+accessKey).then(
         function(response) {
             if(response.status !== 200) {
                 addErrorBox('Update error: ' + response.status);

@@ -4,24 +4,29 @@ require 'sinatra/base'
 
 include Win32
 
-$media_folder="D:/Anime"
+config_file = './config.rb'
+require config_file if File.file? config_file
 
-mpv_path=';D:\Tools\MPV'
-$pipe_name='mpvsocket'
+MEDIA_FOLDER ||= '.'
+MPV_PATH ||= ';.'
+PIPE_NAME ||= 'mpvsocket'
+ACCESS_KEY ||= nil
+NOAUTH_PAGES ||= []
 
 temp_path=ENV['PATH'].dup
-temp_path << mpv_path
+temp_path << ';'
+temp_path << MPV_PATH
 
 mpv_pid=0
 
-if File.exists?(File.join("\\\\.\\pipe\\",$pipe_name))
+if File.exists?(File.join("\\\\.\\pipe\\",PIPE_NAME))
     puts "The pipe is already taken, either there's another MPV WebUI Controller running, or a ghost MPV process"
     return
 end
 
 mpv_pid=Process.spawn({'PATH' => temp_path, 'MPV_HOME'=>'.'}, "mpv.exe")
 
-sleep 0.1 until File.exists?(File.join("\\\\.\\pipe\\",$pipe_name))
+sleep 0.1 until File.exists?(File.join("\\\\.\\pipe\\",PIPE_NAME))
 
 
 $running=true
@@ -51,7 +56,7 @@ sinatra_thread = Thread.new() do
         @@playlist_update_key=0;
         @@media=Array.new;
 
-        @@media=check_folder($media_folder)
+        @@media=check_folder(MEDIA_FOLDER)
 
         class << self
             attr_reader :sinatra_thread
@@ -61,7 +66,7 @@ sinatra_thread = Thread.new() do
             json_cmd={"command" => [cmd, args].flatten}.to_json
 
             out=""
-            Pipe::Client.new($pipe_name, Pipe::ACCESS_DUPLEX, Pipe::NOWAIT, ) do |pipe|
+            Pipe::Client.new(PIPE_NAME, Pipe::ACCESS_DUPLEX, Pipe::NOWAIT, ) do |pipe|
                 pipe.write(json_cmd)
                 pipe.write("\n")
 
@@ -71,6 +76,13 @@ sinatra_thread = Thread.new() do
                 end
             end
             return out
+        end
+
+        get '*' do
+            pass if NOAUTH_PAGES.include?(request.path_info) or params['key'] == ACCESS_KEY
+            
+            status 403;
+            erb :login
         end
 
         get '/' do
